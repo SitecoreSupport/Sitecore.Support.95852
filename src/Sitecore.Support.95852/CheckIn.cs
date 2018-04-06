@@ -53,6 +53,9 @@
       }
       if (!item.Locking.HasLock())
       {
+        #region Added code
+        SheerResponse.Eval("window.parent.location.reload();");
+        #endregion
         return CommandState.Disabled;
       }
       if (!item.Access.CanWriteLanguage())
@@ -65,7 +68,13 @@
     protected void Run(ClientPipelineArgs args)
     {
       Assert.ArgumentNotNull(args, "args");
-      if (SheerResponse.CheckModified())
+      #region Added code
+      CheckModifiedParameters p = new CheckModifiedParameters { ResumePreviousPipeline = true };
+      #endregion
+      #region Modified code
+      // The fix: wait until saveUI pipeline finishes the work
+      if (SheerResponse.CheckModified(p))
+      #endregion
       {
         string itemPath = args.Parameters["id"];
         string name = args.Parameters["language"];
